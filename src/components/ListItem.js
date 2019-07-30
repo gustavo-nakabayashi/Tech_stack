@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { CardSection } from "./common";
 import styled from "styled-components";
 import { connect } from "react-redux";
 import * as actions from "../actions";
+import { LayoutAnimation, UIManager } from "react-native";
 
 const Touch = styled.TouchableWithoutFeedback``;
 
@@ -12,15 +13,27 @@ const TitleText = styled.Text`
   font-size: 18px;
   padding-left: 15px;
   color: #000;
+  flex: 1;
 `;
 
-const ListItem = ({ library, selectLibrary, selectedLibraryId }) => {
+const ListItem = ({ library, selectLibrary, expanded, selected }) => {
+  UIManager.setLayoutAnimationEnabledExperimental &&
+    UIManager.setLayoutAnimationEnabledExperimental(true);
+
   const { id, title, description } = library.item;
 
+  useEffect(() => {
+    console.log("aqui");
+    LayoutAnimation.spring();
+  }, []);
+
   const renderDescription = () => {
-    console.log(id);
-    if (id === selectedLibraryId) {
-      return <TitleText>{description}</TitleText>;
+    if (expanded) {
+      return (
+        <CardSection>
+          <TitleText>{description}</TitleText>
+        </CardSection>
+      );
     }
   };
 
@@ -37,8 +50,9 @@ const ListItem = ({ library, selectLibrary, selectedLibraryId }) => {
   );
 };
 
-const mapStateToPros = state => {
-  return { selectedLibraryId: state.selectedLibraryId };
+const mapStateToPros = (state, ownProps) => {
+  const expanded = state.selectedLibraryId === ownProps.library.item.id;
+  return { expanded };
 };
 
 export default connect(
